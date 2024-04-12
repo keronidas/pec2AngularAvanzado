@@ -12,6 +12,7 @@ import { SharedService } from 'src/app/Services/shared.service';
 })
 export class CategoriesListComponent {
   categories!: CategoryDTO[];
+  rowsAffected!: number;
 
   constructor(
     private categoryService: CategoryService,
@@ -27,9 +28,11 @@ export class CategoriesListComponent {
     const userId = this.localStorageService.get('user_id');
     if (userId) {
       try {
-        this.categories = await this.categoryService.getCategoriesByUserId(
+        this.categoryService.getCategoriesByUserId(
           userId
-        );
+        ).subscribe((data) => {
+          this.categories = data;
+        });
       } catch (error: any) {
         errorResponse = error.error;
         this.sharedService.errorLog(errorResponse);
@@ -54,10 +57,14 @@ export class CategoriesListComponent {
     );
     if (result) {
       try {
-        const rowsAffected = await this.categoryService.deleteCategory(
+        this.categoryService.deleteCategory(
           categoryId
-        );
-        if (rowsAffected.affected > 0) {
+        ).subscribe((rowsAffected) => {
+          this.rowsAffected = rowsAffected.affected;
+        }
+        )
+          ;
+        if (this.rowsAffected > 0) {
           this.loadCategories();
         }
       } catch (error: any) {

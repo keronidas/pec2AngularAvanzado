@@ -43,7 +43,9 @@ export class HomeComponent {
       this.showButtons = true;
     }
     try {
-      this.posts = await this.postService.getPosts();
+      this.postService.getPosts().subscribe((data) => {
+        this.posts = data
+        });
     } catch (error: any) {
       errorResponse = error.error;
       this.sharedService.errorLog(errorResponse);

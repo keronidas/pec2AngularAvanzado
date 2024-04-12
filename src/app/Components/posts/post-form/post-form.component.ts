@@ -90,9 +90,12 @@ export class PostFormComponent implements OnInit {
     const userId = this.localStorageService.get('user_id');
     if (userId) {
       try {
-        this.categoriesList = await this.categoryService.getCategoriesByUserId(
+
+        this.categoryService.getCategoriesByUserId(
           userId
-        );
+        ).subscribe((data) => {
+          this.categoriesList = data
+          });
       } catch (error: any) {
         errorResponse = error.error;
         this.sharedService.errorLog(errorResponse);
@@ -106,7 +109,9 @@ export class PostFormComponent implements OnInit {
     if (this.postId) {
       this.isUpdateMode = true;
       try {
-        this.post = await this.postService.getPostById(this.postId);
+        this.postService.getPostById(this.postId).subscribe((post) => {
+          this.post = post
+          });
 
         this.title.setValue(this.post.title);
 

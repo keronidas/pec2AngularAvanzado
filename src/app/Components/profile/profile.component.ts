@@ -26,6 +26,7 @@ export class ProfileComponent implements OnInit {
   birth_date: UntypedFormControl;
   email: UntypedFormControl;
   password: UntypedFormControl;
+  userData: any;
 
   profileForm: UntypedFormGroup;
   isValidForm: boolean | null;
@@ -96,16 +97,18 @@ export class ProfileComponent implements OnInit {
     const userId = this.localStorageService.get('user_id');
     if (userId) {
       try {
-        const userData = await this.userService.getUSerById(userId);
+        this.userService.getUSerById(userId).subscribe((data) => {
+          this.userData = data
+          });
 
-        this.name.setValue(userData.name);
-        this.surname_1.setValue(userData.surname_1);
-        this.surname_2.setValue(userData.surname_2);
-        this.alias.setValue(userData.alias);
+        this.name.setValue(this.userData.name);
+        this.surname_1.setValue(this.userData.surname_1);
+        this.surname_2.setValue(this.userData.surname_2);
+        this.alias.setValue(this.userData.alias);
         this.birth_date.setValue(
-          formatDate(userData.birth_date, 'yyyy-MM-dd', 'en')
+          formatDate(this.userData.birth_date, 'yyyy-MM-dd', 'en')
         );
-        this.email.setValue(userData.email);
+        this.email.setValue(this.userData.email);
 
         this.profileForm = this.formBuilder.group({
           name: this.name,

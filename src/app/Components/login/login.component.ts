@@ -23,6 +23,7 @@ export class LoginComponent implements OnInit {
   email: UntypedFormControl;
   password: UntypedFormControl;
   loginForm: UntypedFormGroup;
+  authToken: any;
 
   constructor(
     private formBuilder: UntypedFormBuilder,
@@ -51,7 +52,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   async login(): Promise<void> {
     let responseOK: boolean = false;
@@ -60,10 +61,10 @@ export class LoginComponent implements OnInit {
     this.loginUser.email = this.email.value;
     this.loginUser.password = this.password.value;
     try {
-      const authToken = await this.authService.login(this.loginUser);
+      this.authService.login(this.loginUser).subscribe((dato) => { this.authToken = dato });
       responseOK = true;
-      this.loginUser.user_id = authToken.user_id;
-      this.loginUser.access_token = authToken.access_token;
+      this.loginUser.user_id = this.authToken.user_id;
+      this.loginUser.access_token = this.authToken.access_token;
       // save token to localstorage for next requests
       this.localStorageService.set('user_id', this.loginUser.user_id);
       this.localStorageService.set('access_token', this.loginUser.access_token);

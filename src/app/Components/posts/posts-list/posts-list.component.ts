@@ -26,7 +26,9 @@ export class PostsListComponent {
     const userId = this.localStorageService.get('user_id');
     if (userId) {
       try {
-        this.posts = await this.postService.getPostsByUserId(userId);
+        this.postService.getPostsByUserId(userId).subscribe((data) => {
+          this.posts = data
+          });
       } catch (error: any) {
         errorResponse = error.error;
         this.sharedService.errorLog(errorResponse);
@@ -49,8 +51,11 @@ export class PostsListComponent {
     let result = confirm('Confirm delete post with id: ' + postId + ' .');
     if (result) {
       try {
-        const rowsAffected = await this.postService.deletePost(postId);
-        if (rowsAffected.affected > 0) {
+        let rowsAffected = 0
+        this.postService.deletePost(postId).subscribe((data) => {
+          rowsAffected = data.affected;
+          });
+        if (rowsAffected > 0) {
           this.loadPosts();
         }
       } catch (error: any) {

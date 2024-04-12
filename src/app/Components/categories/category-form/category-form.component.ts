@@ -72,9 +72,11 @@ export class CategoryFormComponent implements OnInit {
     if (this.categoryId) {
       this.isUpdateMode = true;
       try {
-        this.category = await this.categoryService.getCategoryById(
+        this.categoryService.getCategoryById(
           this.categoryId
-        );
+        ).subscribe((category) => {
+          this.category = category;
+        });
 
         this.title.setValue(this.category.title);
 

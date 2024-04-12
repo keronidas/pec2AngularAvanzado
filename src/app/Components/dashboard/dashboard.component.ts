@@ -31,7 +31,9 @@ export class DashboardComponent implements OnInit {
   private async loadPosts(): Promise<void> {
     let errorResponse: any;
     try {
-      this.posts = await this.postService.getPosts();
+      this.postService.getPosts().subscribe((data) => {
+        this.posts = data
+        });
     } catch (error: any) {
       errorResponse = error.error;
       this.sharedService.errorLog(errorResponse);
