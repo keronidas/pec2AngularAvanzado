@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AuthDTO } from '../Models/auth.dto';
+import { AuthDTO } from '../models/auth.dto';
 import { Observable } from 'rxjs';
 
 interface AuthToken {

@@ -6,9 +6,9 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthDTO } from 'src/app/Models/auth.dto';
+import { AuthDTO } from 'src/app/auth/models/auth.dto';
 import { HeaderMenus } from 'src/app/Models/header-menus.dto';
-import { AuthService } from 'src/app/Services/auth.service';
+import { AuthService } from 'src/app/auth/services/auth.service';
 import { HeaderMenusService } from 'src/app/Services/header-menus.service';
 import { LocalStorageService } from 'src/app/Services/local-storage.service';
 import { SharedService } from 'src/app/Services/shared.service';
