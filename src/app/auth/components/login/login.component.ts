@@ -10,8 +10,10 @@ import { AuthDTO } from 'src/app/auth/models/auth.dto';
 import { HeaderMenus } from 'src/app/Models/header-menus.dto';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { HeaderMenusService } from 'src/app/Services/header-menus.service';
-import { LocalStorageService } from 'src/app/Services/local-storage.service';
 import { SharedService } from 'src/app/Services/shared.service';
+import { Store } from '@ngrx/store';
+import { AuthState } from '../../models/authState.interface';
+import { setUserCredentials } from '../../actions/auth.actions';
 
 @Component({
   selector: 'app-login',
@@ -30,8 +32,8 @@ export class LoginComponent implements OnInit {
     private authService: AuthService,
     private sharedService: SharedService,
     private headerMenusService: HeaderMenusService,
-    private localStorageService: LocalStorageService,
-    private router: Router
+    private router: Router,
+    private store: Store<AuthState>
   ) {
     this.loginUser = new AuthDTO('', '', '', '');
 
@@ -61,13 +63,22 @@ export class LoginComponent implements OnInit {
     this.loginUser.email = this.email.value;
     this.loginUser.password = this.password.value;
     try {
-      this.authService.login(this.loginUser).subscribe((dato) => { this.authToken = dato });
+      this.authService.login(this.loginUser).subscribe((dato) => { this.authToken = dato.access_token });
       responseOK = true;
-      this.loginUser.user_id = this.authToken.user_id;
-      this.loginUser.access_token = this.authToken.access_token;
+
+      this.store.dispatch(setUserCredentials({ credentials: new AuthDTO(this.authToken.user_id, this.authToken.access_token, this.email.value, this.password.value) }));
+this.store.select('credentials').subscribe((data) => console.log(data));
+      console.log("Funcione!")
+      
+      
+
+      // this.loginUser.user_id = this.authToken.user_id;
+      // this.loginUser.access_token = this.authToken.access_token;
       // save token to localstorage for next requests
-      this.localStorageService.set('user_id', this.loginUser.user_id);
-      this.localStorageService.set('access_token', this.loginUser.access_token);
+
+
+      // this.localStorageService.set('user_id', this.loginUser.user_id);
+      // this.localStorageService.set('access_token', this.loginUser.access_token);
     } catch (error: any) {
       responseOK = false;
       errorResponse = error.error;

@@ -1,35 +1,40 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { CategoryDTO } from 'src/app/Models/category.dto';
 import { CategoryService } from 'src/app/Services/category.service';
-import { LocalStorageService } from 'src/app/Services/local-storage.service';
 import { SharedService } from 'src/app/Services/shared.service';
+import { AuthState } from 'src/app/auth/models/authState.interface';
 
 @Component({
   selector: 'app-categories-list',
   templateUrl: './categories-list.component.html',
   styleUrls: ['./categories-list.component.scss'],
 })
-export class CategoriesListComponent {
+export class CategoriesListComponent implements OnInit{
   categories!: CategoryDTO[];
   rowsAffected!: number;
-
+  userId:any;
   constructor(
     private categoryService: CategoryService,
     private router: Router,
-    private localStorageService: LocalStorageService,
-    private sharedService: SharedService
+    private sharedService: SharedService,
+    private store : Store<AuthState>
   ) {
     this.loadCategories();
   }
+ngOnInit(): void {
 
+  // TODO: Aqui no encuentro la forma de obtener el userId
+  // ****************************************************
+     this.store.select('credentials').subscribe((data) =>this.userId = data?.user_id);      
+}
   private async loadCategories(): Promise<void> {
     let errorResponse: any;
-    const userId = this.localStorageService.get('user_id');
-    if (userId) {
+    if (this.userId) {
       try {
         this.categoryService.getCategoriesByUserId(
-          userId
+          this.userId
         ).subscribe((data) => {
           this.categories = data;
         });

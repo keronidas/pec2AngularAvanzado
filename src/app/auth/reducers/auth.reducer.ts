@@ -1,21 +1,20 @@
-import { Action } from "rxjs/internal/scheduler/Action";
-import { AuthDTO } from "../models/auth.dto";
+
 import { AuthState } from "../models/authState.interface";
+import * as AuthActions from '../actions/auth.actions';
+import { Action, createReducer,on } from "@ngrx/store";
+import { AuthDTO } from "../models/auth.dto";
 
-export const initialState: AuthDTO = new AuthDTO('', '', '', '');
+export const initialState: AuthState = { credentials: new AuthDTO("","","",""), loading: false, loaded: false, error: null };
 
-// const _authReducer = createReducer(
-//     initialState,
-//     on(autho, (state, { credentials }) => { }
-//     ));
 
-export function checkAuth(state: AuthState, action: Action) {
 
-    switch (action.type) {
-        case 'autho':
-            return state;
-        default:
-            return state;
-    }
-    
-}
+const authReducer = createReducer(
+    initialState,
+    on(AuthActions.setUserCredentials, (state, { credentials }) => ({ ...state, credentials: credentials })),
+    on(AuthActions.clearUserCredentials, state => ({ ...state, credentials: null })),
+    on(AuthActions.loadUserCredentials, state => ({ ...state, loading: true, error: null })),
+);
+
+export function reducer(state: AuthState | undefined, action: Action) {
+    return authReducer(state, action);
+  }

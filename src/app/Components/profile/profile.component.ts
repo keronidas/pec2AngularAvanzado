@@ -6,10 +6,11 @@ import {
   UntypedFormGroup,
   Validators,
 } from '@angular/forms';
+import { Store } from '@ngrx/store';
 import { UserDTO } from 'src/app/Models/user.dto';
-import { LocalStorageService } from 'src/app/Services/local-storage.service';
 import { SharedService } from 'src/app/Services/shared.service';
 import { UserService } from 'src/app/Services/user.service';
+import { AuthState } from 'src/app/auth/models/authState.interface';
 
 @Component({
   selector: 'app-profile',
@@ -27,6 +28,7 @@ export class ProfileComponent implements OnInit {
   email: UntypedFormControl;
   password: UntypedFormControl;
   userData: any;
+  userId: any;
 
   profileForm: UntypedFormGroup;
   isValidForm: boolean | null;
@@ -35,7 +37,7 @@ export class ProfileComponent implements OnInit {
     private formBuilder: UntypedFormBuilder,
     private userService: UserService,
     private sharedService: SharedService,
-    private localStorageService: LocalStorageService
+    private store: Store<AuthState>
   ) {
     this.profileUser = new UserDTO('', '', '', '', new Date(), '', '');
 
@@ -94,10 +96,10 @@ export class ProfileComponent implements OnInit {
     let errorResponse: any;
 
     // load user data
-    const userId = this.localStorageService.get('user_id');
-    if (userId) {
+    this.store.select('credentials').subscribe((data) =>this.userId = data);   
+    if (this.userId) {
       try {
-        this.userService.getUSerById(userId).subscribe((data) => {
+        this.userService.getUSerById(this.userId).subscribe((data) => {
           this.userData = data
           });
 
@@ -138,11 +140,11 @@ export class ProfileComponent implements OnInit {
     this.isValidForm = true;
     this.profileUser = this.profileForm.value;
 
-    const userId = this.localStorageService.get('user_id');
+    this.store.select('credentials').subscribe((data) =>this.userId = data);   
 
-    if (userId) {
+    if (this.userId) {
       try {
-        await this.userService.updateUser(userId, this.profileUser);
+        await this.userService.updateUser(this.userId, this.profileUser);
         responseOK = true;
       } catch (error: any) {
         responseOK = false;

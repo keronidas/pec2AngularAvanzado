@@ -6,10 +6,11 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { CategoryDTO } from 'src/app/Models/category.dto';
 import { CategoryService } from 'src/app/Services/category.service';
-import { LocalStorageService } from 'src/app/Services/local-storage.service';
 import { SharedService } from 'src/app/Services/shared.service';
+import { AuthState } from 'src/app/auth/models/authState.interface';
 
 @Component({
   selector: 'app-category-form',
@@ -28,6 +29,7 @@ export class CategoryFormComponent implements OnInit {
   private isUpdateMode: boolean;
   private validRequest: boolean;
   private categoryId: string | null;
+  userId: any;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -35,7 +37,7 @@ export class CategoryFormComponent implements OnInit {
     private formBuilder: UntypedFormBuilder,
     private router: Router,
     private sharedService: SharedService,
-    private localStorageService: LocalStorageService
+    private store: Store<AuthState>
   ) {
     this.isValidForm = null;
     this.categoryId = this.activatedRoute.snapshot.paramMap.get('id');
@@ -100,9 +102,9 @@ export class CategoryFormComponent implements OnInit {
     let errorResponse: any;
     let responseOK: boolean = false;
     if (this.categoryId) {
-      const userId = this.localStorageService.get('user_id');
-      if (userId) {
-        this.category.userId = userId;
+      this.store.select('credentials').subscribe((data) =>this.userId = data);   
+      if (this.userId) {
+        this.category.userId = this.userId;
         try {
           await this.categoryService.updateCategory(
             this.categoryId,
@@ -131,9 +133,9 @@ export class CategoryFormComponent implements OnInit {
   private async createCategory(): Promise<boolean> {
     let errorResponse: any;
     let responseOK: boolean = false;
-    const userId = this.localStorageService.get('user_id');
-    if (userId) {
-      this.category.userId = userId;
+    this.store.select('credentials').subscribe((data) =>this.userId = data);   
+    if (this.userId) {
+      this.category.userId = this.userId;
       try {
         await this.categoryService.createCategory(this.category);
         responseOK = true;

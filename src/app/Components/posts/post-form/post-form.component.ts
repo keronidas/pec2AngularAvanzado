@@ -7,12 +7,13 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { CategoryDTO } from 'src/app/Models/category.dto';
 import { PostDTO } from 'src/app/Models/post.dto';
 import { CategoryService } from 'src/app/Services/category.service';
-import { LocalStorageService } from 'src/app/Services/local-storage.service';
 import { PostService } from 'src/app/Services/post.service';
 import { SharedService } from 'src/app/Services/shared.service';
+import { AuthState } from 'src/app/auth/models/authState.interface';
 
 @Component({
   selector: 'app-post-form',
@@ -27,7 +28,7 @@ export class PostFormComponent implements OnInit {
   num_dislikes!: UntypedFormControl;
   publication_date: UntypedFormControl;
   categories!: UntypedFormControl;
-
+  userId: any;
   postForm: UntypedFormGroup;
   isValidForm: boolean | null;
 
@@ -43,8 +44,8 @@ export class PostFormComponent implements OnInit {
     private formBuilder: UntypedFormBuilder,
     private router: Router,
     private sharedService: SharedService,
-    private localStorageService: LocalStorageService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private store: Store<AuthState>,
   ) {
     this.isValidForm = null;
     this.postId = this.activatedRoute.snapshot.paramMap.get('id');
@@ -87,15 +88,15 @@ export class PostFormComponent implements OnInit {
 
   private async loadCategories(): Promise<void> {
     let errorResponse: any;
-    const userId = this.localStorageService.get('user_id');
-    if (userId) {
+    this.store.select('credentials').subscribe((data) => this.userId = data);
+    if (this.userId) {
       try {
 
         this.categoryService.getCategoriesByUserId(
-          userId
+          this.userId
         ).subscribe((data) => {
           this.categoriesList = data
-          });
+        });
       } catch (error: any) {
         errorResponse = error.error;
         this.sharedService.errorLog(errorResponse);
@@ -111,7 +112,7 @@ export class PostFormComponent implements OnInit {
       try {
         this.postService.getPostById(this.postId).subscribe((post) => {
           this.post = post
-          });
+        });
 
         this.title.setValue(this.post.title);
 
@@ -150,9 +151,9 @@ export class PostFormComponent implements OnInit {
     let errorResponse: any;
     let responseOK: boolean = false;
     if (this.postId) {
-      const userId = this.localStorageService.get('user_id');
-      if (userId) {
-        this.post.userId = userId;
+      this.store.select('credentials').subscribe((data) =>this.userId = data);   
+      if (this.userId) {
+        this.post.userId = this.userId;
         try {
           await this.postService.updatePost(this.postId, this.post);
           responseOK = true;
@@ -178,9 +179,9 @@ export class PostFormComponent implements OnInit {
   private async createPost(): Promise<boolean> {
     let errorResponse: any;
     let responseOK: boolean = false;
-    const userId = this.localStorageService.get('user_id');
-    if (userId) {
-      this.post.userId = userId;
+    this.store.select('credentials').subscribe((data) =>this.userId = data);   
+    if (this.userId) {
+      this.post.userId = this.userId;
       try {
         await this.postService.createPost(this.post);
         responseOK = true;

@@ -1,7 +1,6 @@
 import { createAction, props } from "@ngrx/store";
-import { AuthState } from "../models/authState.interface";
+import { AuthDTO } from "../models/auth.dto";
 
-export const autho = createAction(
-    '[Auth] Cheking Auth',
-    props<AuthState>()
-)
+export const setUserCredentials = createAction('[Auth] Creando credenciales', props<{ credentials: AuthDTO }>());
+export const clearUserCredentials = createAction('[Auth] Limpiando credenciales');
+export const loadUserCredentials = createAction('[Auth] Cargando credenciales');

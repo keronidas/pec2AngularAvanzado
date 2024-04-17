@@ -19,6 +19,7 @@ import { FormatDatePipe } from './Pipes/format-date.pipe';
 import { DashboardComponent } from './Components/dashboard/dashboard.component';
 import { AuthModule } from './auth/auth.module';
 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -41,6 +42,10 @@ import { AuthModule } from './auth/auth.module';
     ReactiveFormsModule,
     HttpClientModule,
     AuthModule,
+
+  ],
+  exports:[
+
   ],
   providers: [
     {

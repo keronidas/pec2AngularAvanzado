@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { HeaderMenus } from 'src/app/Models/header-menus.dto';
 import { PostDTO } from 'src/app/Models/post.dto';
 import { HeaderMenusService } from 'src/app/Services/header-menus.service';
-import { LocalStorageService } from 'src/app/Services/local-storage.service';
 import { PostService } from 'src/app/Services/post.service';
 import { SharedService } from 'src/app/Services/shared.service';
+import { AuthState } from 'src/app/auth/models/authState.interface';
 
 @Component({
   selector: 'app-home',
@@ -15,10 +16,11 @@ import { SharedService } from 'src/app/Services/shared.service';
 export class HomeComponent {
   posts!: PostDTO[];
   showButtons: boolean;
+  userId: any;
 
   constructor(
     private postService: PostService,
-    private localStorageService: LocalStorageService,
+    private store: Store<AuthState>,
     private sharedService: SharedService,
     private router: Router,
     private headerMenusService: HeaderMenusService
@@ -38,8 +40,8 @@ export class HomeComponent {
   }
   private async loadPosts(): Promise<void> {
     let errorResponse: any;
-    const userId = this.localStorageService.get('user_id');
-    if (userId) {
+    this.store.select('credentials').subscribe((data) => this.userId = data?.user_id);
+    if (this.userId) {
       this.showButtons = true;
     }
     try {
